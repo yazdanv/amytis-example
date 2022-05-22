@@ -1,0 +1,158 @@
+<views class="local" bgc="bl">
+    <script>
+        var db = Dyko.open("db");
+        var zones = db.collection("zones");
+        var _id = 0;
+        var dt = 1;
+        var zoneCount = 5;
+        var outCount = 2;
+        var name = "";
+
+        function viewLoaded() {viewAppeared()}
+
+        function viewAppeared() {
+            deviceType.titles(0, ["M910", "M930"]);
+            deviceType._onSelect = function(row, cmp) {
+                setAll()
+                dt = row + 1;
+                setZoneCount();
+            };
+            setZoneCount();
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    installLocation.text = res[0].name;
+                    simNumber.text = res[0].number;
+                    devicePass.text = res[0].pass;
+                    name = res[0].name;
+                    _id = res[0]._id;
+                    zoneCount = res[0].zones;
+                    outCount = res[0].outCount;
+                    dt = res[0].dt;
+                    deviceType.select(0, dt - 1);
+                    setZoneCount();     
+                    if (res[0].outAcc1 != undefined) {
+                        sw1.status = res[0].outAcc1;
+                        sw2.status = res[0].outAcc2;
+                        sw3.status = res[0].outAcc3;
+                        sw4.status = res[0].outAcc4;
+                        sw5.status = res[0].outAcc5;
+                    }
+                    if (res[0].outType1 != undefined) {
+                        setType1(res[0].outType1);
+                        setType2(res[0].outType2);
+                        setType3(res[0].outType3);
+                        setType4(res[0].outType4);
+                        setType5(res[0].outType5);
+                    }
+                }
+            });
+        }
+
+        function setZoneCount() {
+            if (dt == 1) {
+                zoneCount = 5;
+                outCount = 2;
+            } else if (dt == 2) {
+                zoneCount = 5;
+                outCount = 5;
+            }
+            if (outCount == 2) {
+                outSaveView3.animateToFrame("1/1*2--1/13*9.8");
+                outSaveView4.animateToFrame("1/1*2--1/13*10.7");
+                outSaveView5.animateToFrame("1/1*2--1/13*11.6");
+            } else {
+                outSaveView3.animateToFrame("1--1/13*9.8");
+                outSaveView4.animateToFrame("1--1/13*10.7");
+                outSaveView5.animateToFrame("1--1/13*11.6");
+            }
+        }
+
+        function setAll() {
+            sw1.status = true;
+            sw2.status = true;
+            sw3.status = true;
+            sw4.status = true;
+            sw5.status = true;
+        }
+
+        function createNew() {
+            tt.reRender({ text: "محل جدید" });
+            _id = 0;
+            installLocation.text = "";
+            simNumber.text = "";
+            devicePass.text = "";
+        }
+
+        function sv() {
+            if (_id == 0) {
+                zones.all(function (res) {
+                    for (r in res) {
+                        zones.modify(res[r]._id, { selected: false }, function (done) { zones.commit();});
+                    }
+ zones.insert({ name: installLocation.txt, number: simNumber.txt, pass: devicePass.txt, selected: true, zones: zoneCount,
+simType: 1, outCount: outCount, dt: dt, outAcc1: sw1.status, outAcc2: sw2.status, outAcc3: sw3.status, outAcc4: sw4.status,
+outAcc5: sw5.status, outType1: actionType1, outType2: actionType2, outType3: actionType3, outType4: actionType4, outType5:
+actionType5},
+function (i) {
+                        toast("با موفقیت ذخیره شد" + "\nبرای اعمال یکبار به صفحه اصلی بازگردید");
+                        zones.commit();
+                    });
+                });
+            } else {
+ zones.modifyQuery({ selected: true }, { name: installLocation.txt, number: simNumber.txt, pass: devicePass.txt, selected:
+true, zones: zoneCount, outCount: outCount, dt: dt, outAcc1: sw1.status, outAcc2: sw2.status, outAcc3: sw3.status, outAcc4:
+sw4.status, outAcc5: sw5.status, outType1: actionType1, outType2: actionType2, outType3: actionType3, outType4: actionType4,
+outType5: actionType5}, function (done)
+{
+                    toast("با موفقیت ذخیره شد" + "\nبرای اعمال یکبار به صفحه اصلی بازگردید");
+                    zones.commit();
+                });
+            }
+        }
+
+        function del() {
+            self.jsChoices({message: "آیا می خواهید {0} را حذف کنید".format(name), buttons: ["بله", "خیر"], completion: function (index) {
+                if (index == 1) {zones.delete(_id); zones.commit(); createNew();}
+                toast("با موفقیت حذف شد \n لطفا یکبار از برنامه خارج شده و دوباره وارد شوید");
+            }});
+        }
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید"/>
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help1"});</button>
+    </topBar>
+
+    <pLabel frame="2/5*3.8--0.9/12*2.2" alignment="rtl" text="نام محل نصب" ts="f7"/>
+    <textfield id="installLocation" frame="2.9/5*1.1--0.9/12*2.2" padding="8" bgc="white" bs="line"/>
+
+    <pLabel frame="2/5*3.8--0.9/12*3.1" alignment="rtl" text="شماره سیم کارت" ts="f7" />
+    <textfield id="simNumber" frame="2.9/5*1.1--0.9/12*3.1" padding="8" bgc="white"  bs="line" maxCharacters="11" keyboardType="num"/>
+
+    <pLabel frame="2/5*3.8--0.9/12*4" alignment="rtl" text="رمز دستگاه" ts="f7" />
+    <textfield id="devicePass" frame="2.9/5*1.1--0.9/12*4" padding="8" bgc="white"  bs="line" maxCharacters="4" keyboardType="num"/>
+
+    <pLabel frame="2/5*3.8--0.9/12*4.9" alignment="rtl" text="مدل دستگاه" ts="f7" />
+    <picker id="deviceType" frame="2.9/5*1.1--0.9/12*4.9" padding="8" bgc="white" />
+
+    <view frame="4/5*1.5--1/50*21" height="1" bgc="white" />
+
+    <pLabel frame="3/5*2.8--1/13*6" text="تنظیمات خروجی ها" ts="f7" alignment="rtl"/>
+    <pLabel frame="2/5*3.8--1/13*6.6" text="دریافت تایید" ts="f5.5" alignment="rtl"/>
+    <pLabel frame="3/5*1--1/13*6.6" text="نوع عملکرد خروجی" ts="f5.5" alignment="center"/>
+    <button frame="0.8/5*3.2--1/13*7.4" text="دائم" font="IRANSans" ts="f5.5" lines="3"></button>
+    <button frame="0.8/5*2.35--1/13*7.4" text="لحظه ای" font="IRANSans" ts="f4.5" lines="3"></button>
+    <button frame="0.8/5*1.35--1/13*7.4" text="لحظه ای و دائم" font="IRANSans" ts="f4.5" lines="3"></button>
+    <outSaveView pos="1" frame="1--1/13*8"/>
+    <outSaveView pos="2" frame="1--1/13*8.9" />
+    <outSaveView pos="3" frame="1--1/13*9.8" />
+    <outSaveView pos="4" frame="1--1/13*10.7" />
+    <outSaveView pos="5" frame="1--1/13*11.6" />
+
+    <view frame="4/5*1.5--1/50*45" height="1" bgc="white" />
+
+    <button frame="2/5*3.5--0.7/12*11.6" id="save" text="ذخیره" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv" font="IRANSans"/>
+    <button frame="2/5*1.5--0.7/12*11.6" id="newItem" text="جدید" round="5" bgc="bbtn" tc="white" padding="2" clicked="createNew" font="IRANSans"/>
+    <button frame="2/5*3.5--0.7/12*12.3" id="deleteItem" text="حذف" round="5" bgc="bbtn" tc="white" padding="2" clicked="del" font="IRANSans"/>
+    <button frame="2/5*1.5--0.7/12*12.3" id="more" text="تنظیمات بیشتر" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans" clicked="if (_id != 0) {open('more_setting');} else {toast('ابتدا یک زون ذخیره کنید');}"/>
+</views>

@@ -1,0 +1,27 @@
+<views class="local" bgc="bbtn">
+    <script>
+        var appPass = '0000'
+        var u = Dyko.open("db").collection("user");
+        u.all(function (res) {
+            if (res.length == 0) {
+                u.insert({isAdmin: 1, appPass: '0000'}, function (_id) {
+                    u.commit();
+                })
+            } else {
+                appPass = res[0].appPass;
+            }
+        });
+        pass.event("changed", function () {
+                   log(pass.txt);
+            if (pass.txt == appPass) {
+                pass.text = "";
+                open("control");
+            }
+        });
+    </script>
+    <topBar hidden="true"/>
+    <image frame="2/3*1.5--1/8*2.1" source="logo4"/>
+    <pLabel id="label" frame="1--1/12*5" text="رمز را وارد کنید" ts="f9"/>
+    <pLabel id="label2" frame="1--1/12*7" text="v 1.05" ts="f6" />
+    <textfield id="pass" frame="1--1/12*6" bgc="cyan" padding="8,24,8,24" secure="yes" keyboardType="num"/>
+</views>

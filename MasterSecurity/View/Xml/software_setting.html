@@ -1,0 +1,80 @@
+<views class="local" bgc="bl">
+    <script>
+        var _id = 0;
+        var _id2 = 0;
+        var appPass = '';
+        var isAdmin0 = 0;
+        var u = Dyko.open("db").collection("user");
+        var zones = Dyko.open("db").collection("zones");
+
+        function viewLoaded() {
+            viewAppeared()
+        }
+
+        function viewAppeared() {
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    _id2 = res[0]._id;
+                }
+            });
+            u.all(function (res) {
+                log(res);
+                _id = res[0]._id;
+                isAdmin0 = res[0].isAdmin;
+                appPass = res[0].appPass;
+                passField.text = appPass;
+            });
+            if (isAdmin0 == 1) { 
+                aCheck.reRender({ hidden: 'false' }); 
+                uCheck.reRender({ hidden: 'true' }); 
+            } else { 
+                uCheck.reRender({ hidden: 'false' }); 
+                aCheck.reRender({ hidden: 'true' }); 
+            }
+        }
+
+        function reset() {
+            self.jsChoices({message: "آیا می خواهید به تنظیمات اولیه باز گردید؟", buttons: ["بله", "خیر"], completion: function (index) {
+                    u.delete(_id); u.commit();
+                    zones.delete(_id2); zones.commit();
+                    toast("انجام شد", function () {
+                        self.pop(true, true);
+                    });
+            }});
+        }
+
+        function saveIsAdmin() {
+            log(isAdmin0);
+            u.modifyQuery({_id: _id}, {isAdmin: isAdmin0}, function (done) {
+                toast("ذخیره شد");
+                u.commit();
+            });
+        }
+
+        function savePass() {
+            u.modifyQuery({ _id: _id }, { appPass: passField.txt }, function (done) {
+                          toast("ذخیره شد\n لطفا یکبار نرم افزار را بسته و مجددا باز کنید", function() {}, {time: 2.0});
+                u.commit();
+            });
+        }
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="Master Security"/>
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help2"});</button>
+    </topBar>
+    <pLabel frame="4/5*1.5--1/12*2.2" alignment="rtl" text="تعیین نوع کاربری" ts="f10"/>
+    <button id="admin" frame="1.5/5*4.5--1/12*3.2" text="مدیر سیستم" font="IRANSans">isAdmin0 = 1; aCheck.reRender({hidden: 'false'}); uCheck.reRender({hidden: 'true'});</button>
+    <image id="aCheck" frame="0.5/5*4--1/12*3.2" source="check" padding="16"/>
+    <button id="user" frame="1.5/5*2.5--1/12*3.2" text="کاربر عادی" font="IRANSans">isAdmin0 = 0; uCheck.reRender({hidden: 'false'}); aCheck.reRender({hidden: 'true'});</button>
+    <image id="uCheck" frame="0.5/5*2--1/12*3.2" source="check"  padding="16" hidden="yes"/>
+    <button frame="1.5/5*1.2--0.8/12*4.3" text="ذخیره" clicked="saveIsAdmin" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans"/>
+    <view frame="4/5*1.5--1/50*20" height="1" bgc="white"/>
+
+    <pLabel frame="2/5*3.8--1/12*5.8" alignment="rtl" text="رمز نرم افزار" ts="f8" />
+    <textfield id="passField" frame="2.9/5*1.1--1/12*5.8" padding="8" bgc="white" bs="line" keyboardType="num"/>
+    <button frame="1.5/5*1.2--0.8/12*7" text="ذخیره" clicked="savePass" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans"/>
+    <view frame="4/5*1.5--1/50*31" height="1" bgc="white" />
+
+    <pLabel frame="11/12*1.5--1/12*8.3" alignment="rtl" text="بازگشت به تنظیمات اولیه نرم افزار" ts="f8" />
+    <button frame="1.5/5*1.2--0.8/12*9.6" text="تایید" clicked="reset" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans"/>
+</views>

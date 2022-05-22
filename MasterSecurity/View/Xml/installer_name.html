@@ -1,0 +1,43 @@
+<views class="local" bgc="bl">
+    <script>
+        var zones = Dyko.open("db").collection("zones");
+        var _id = 0;
+        var num = "";
+        var pass = "";
+
+        function viewLoaded() {
+            viewAppeared()
+        }
+    
+        function viewAppeared() {
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    num = res[0].number;
+                    pass = res[0].pass;
+                    var vl = "installerName"
+                       if (vl in res[0]) { field.reRender({ text: res[0][vl] }); } else {field.reRender({ text: "مشخصات نصب کننده" });}
+                    
+                }
+            });
+        }
+
+        function sv() {
+            zones.modifyQuery({ selected: true }, { installerName: field.txt}, function (done) { zones.commit();});
+        }
+
+        function svSend() {
+            zones.modifyQuery({ selected: true }, { installerName: field.txt}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**36#{1}#".format(pass, field.txt), [num]);
+        }
+
+        </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help7"});</button>
+    </topBar>
+    <lField2 pos="" frame="1--3/12*2.5" text="نصب کننده" ctxt="مشخصات نصب کننده" mc="30"/>
+    
+    <button frame="2/5*1.5--1/12*6" id="saveSendB" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="svSend" font="IRANSans"/>
+</views>

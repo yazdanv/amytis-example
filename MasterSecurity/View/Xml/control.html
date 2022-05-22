@@ -1,0 +1,132 @@
+<views class="local" bgc="white">
+    <script>
+        var num = "";
+        var pass = "";
+        var simType = 0;
+        var zoneCount = 5;
+        var outCount = 2;
+        var mute = false;
+        var outAcc1 = true;
+        var outAcc2 = true;
+        var outAcc3 = true;
+        var outAcc4 = true;
+        var outAcc5 = true;
+        function mStr() {
+            if (mute) { return "0" } else { return "1" }
+        }
+
+        function viewAppeared() {
+            pass = "";
+            var db = Dyko.open("db");
+            var zones = db.collection("zones");
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    num = res[0].number;
+                    pass = res[0].pass;
+                    simType = res[0].simType;
+                    zoneCount = res[0].zones;
+                    outCount = res[0].outCount;
+                    zonesCheck();
+                    if (outCount == 2) {
+                        outView3.animateToFrame("1/1*4--1/6*3");
+                        outView4.animateToFrame("1/1*4--1/6*4");
+                        outView5.animateToFrame("1/1*4--1/6*5");
+                    } else {
+                        outView3.animateToFrame("1--1/6*3");
+                        outView4.animateToFrame("1--1/6*4");
+                        outView5.animateToFrame("1--1/6*5");
+                    }
+                    if (res[0].outAcc1 != undefined) {
+                        outAcc1 = res[0].outAcc1;
+                        outAcc2 = res[0].outAcc2;
+                        outAcc3 = res[0].outAcc3;
+                        outAcc4 = res[0].outAcc4;
+                        outAcc5 = res[0].outAcc5;
+                    }
+                    if (res[0].outType1 != undefined) {
+                        setType1(res[0].outType1);
+                        setType2(res[0].outType2);
+                        setType3(res[0].outType3);
+                        setType4(res[0].outType4);
+                        setType5(res[0].outType5);
+                    }
+                    if (res[0].nameOut1 != undefined) {
+                        setOutName1(res[0].nameOut1);
+                        setOutName2(res[0].nameOut2);
+                        setOutName3(res[0].nameOut3);
+                        setOutName4(res[0].nameOut4);
+                        setOutName5(res[0].nameOut5);
+                    } else {
+                       setOutName1("خروجی {0}".format(1));
+                       setOutName2("خروجی {0}".format(2));
+                       setOutName3("خروجی {0}".format(3));
+                       setOutName4("خروجی {0}".format(4));
+                       setOutName5("خروجی {0}".format(5));
+                    }
+                    if (res[0].nameZone1 != undefined) {
+                        setZoneName1(res[0].nameZone1);
+                        setZoneName2(res[0].nameZone2);
+                        setZoneName3(res[0].nameZone3);
+                        setZoneName4(res[0].nameZone4);
+                        setZoneName5(res[0].nameZone5);
+                    } else {
+                       setZoneName1("زون {0}".format(1));
+                       setZoneName2("زون {0}".format(2));
+                       setZoneName3("زون {0}".format(3));
+                       setZoneName4("زون {0}".format(4));
+                       setZoneName5("زون {0}".format(5));
+                    }
+                }
+            });
+        }
+
+        function inp() {
+            self.input({message: "رمز شارژ را وارد کنید", completion: function (msg) {
+                self.sendSMS("*{0}**24*{1}#".format(pass, msg), [num]);
+            }})
+        }
+    </script>
+    <topBar hidden="false" title="Master" bgc="ymain" frame="p.w * 0.9">
+        <topView/>
+        <button frame="1/8*8--1" source="ic_setting" square="yes" padding="2,12,2,0">self.jsOpen('setting', {}, "Main");</button>
+        <button frame="1/8*8--1" source="ic_setting" square="yes" padding="2,12,2,0">self.jsOpen('setting', {}, "Main");</button>
+    </topBar>
+    <image frame="2.5/5*2.25--1/18*2.5" source="logo4" padding="64,0,0,0"/>
+    <view id="tframe" frame="3.8/5*1.6--1/4*1.9" heightRatio="0.85">
+        <button frame="1/2*1--1/2*1" source="btn_active" padding="0,12,6,0" font="IRANSans">
+            self.sendSMS("*{0}**01{1}".format(pass, mStr()), [num]);
+        </button>
+        <button frame="1/2*2--1/2*1" source="btn_deactive"  padding="0,0,6,12" font="IRANSans">
+            self.sendSMS("*{0}**02{1}".format(pass, mStr()), [num]);
+        </button>
+        <button frame="1/2*1--1/2*2" source="btn_half_active"  padding="6,12,0,0" font="IRANSans">
+            self.sendSMS("*{0}**03{1}".format(pass, mStr()), [num]);
+        </button>
+        <button frame="1/2*2--1/2*2" source="btn_delete_zone"  padding="6,0,0,12" font="IRANSans">
+             zonesCheck();
+            view.switchViews("zonesScreen", "");
+        </button>
+        <button id="sound" frame="1.1/3*1.95--1.1/3*1.95" source="sound" circle="yes" padding="0,2,4,0" font="IRANSans">
+             mute = !mute; if (mute) { sound.reRender({'source': 'mute'}); } else { sound.reRender({'source': 'sound'}); }
+        </button>
+    </view>
+    <view frame="3.8/5*1.6--1/4*2.9" heightRatio="0.85" y="tframe.y + tframe.h" padding="12,0,0,0">
+        <button frame="1--1/4*1" text="توقف هشدار" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans">self.sendSMS("*{0}**10".format(pass), [num]);</button>
+        <button frame="1--1/4*2" text="خروجی ها" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans">view.switchViews("outViews", "");</button>
+        <button frame="1--1/4*3" text="اعلام وضعیت" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans">self.sendSMS("*{0}**11".format(pass), [num]);</button>
+        <button frame="1/2*1--1/4*4" text="کنترل شارژ" round="5" bgc="bbtn" tc="white" padding="2" font="IRANSans">
+            self.sendSMS("*{0}**23".format(pass), [num]);
+        </button>
+        <button frame="1/2*2--1/4*4" text="شارژ" round="5" bgc="bbtn" tc="white" padding="2" clicked="inp"/>
+    </view>
+    <zonesScreen hidden="true"/>
+    <view id="outViews" frame="11/12*1.5--3/5*2" bgc="white" elevation="5" hidden="true">
+        <outLine pos="1" />
+        <outLine pos="2" />
+        <outLine pos="3" />
+        <outLine pos="4" />
+        <outLine pos="5" />
+        <button frame="1/2*1--1/6*6" text="بستن">view.switchViews("", "outViews");</button>
+    </view>
+</views>

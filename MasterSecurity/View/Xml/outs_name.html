@@ -1,0 +1,69 @@
+<views class="local" bgc="bl">
+    <script>
+        var zones = Dyko.open("db").collection("zones");
+        var _id = 0;
+        var num = "";
+        var pass = "";
+        var outCount = 2;
+
+        function viewLoaded() {
+            viewAppeared()
+        }
+    
+        function viewAppeared() {
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    num = res[0].number;
+                    pass = res[0].pass;
+                    outCount = res[0].outCount;
+                    if (res[0].outCount == 2) {
+                        lField3.animateToFrame("1/1*2--1/12*4.5");
+                        lField4.animateToFrame("1/1*2--1/12*5.5");
+                        lField5.animateToFrame("1/1*2--1/12*6.5");
+                   } else {
+                       lField3.animateToFrame("1/1*1--1/12*4.5");
+                       lField4.animateToFrame("1/1*1--1/12*5.5");
+                       lField5.animateToFrame("1/1*1--1/12*6.5");
+                   }
+                    var i = 0;
+                    var cnt = [1, 2, 3, 4, 5];
+                    for (i in cnt) {
+                        var vl = "nameOut{0}".format(cnt[i]);
+                        if (vl in res[0]) { self.textfield("field{0}".format(cnt[i])).reRender({ text: res[0][vl] });
+                        } else {self.textfield("field{0}".format(cnt[i])).reRender({text: "خروجی {0}".format(cnt[i])});}
+                    }
+                }
+            });
+        }
+
+        function sv() {
+            zones.modifyQuery({ selected: true }, { nameOut1: field1.txt, nameOut2: field2.txt,  nameOut3: field3.txt, nameOut4: field4.txt,  nameOut5: field5.txt}, function (done) { zones.commit();});
+            toast("ذخیره شد");
+        }
+
+        function svSend() {
+            zones.modifyQuery({ selected: true }, { nameOut1: field1.txt, nameOut2: field2.txt,  nameOut3: field3.txt, nameOut4: field4.txt,  nameOut5: field5.txt}, function (done) { zones.commit();});
+            if (outCount == 2) {
+                self.sendSMS("*{0}**35#{1}!{2}!".format(pass, field1.txt, field2.txt), [num]);
+            } else {
+                self.sendSMS("*{0}**35#{1}!{2}!{3}!{4}!{5}!".format(pass, field1.txt, field2.txt, field3.txt, field4.txt, field5.txt), [num]);
+            }
+        }
+
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help6"});</button>
+    </topBar>
+    <lField pos="1" frame="1--1/12*2.5" text="خروجی" />
+    <lField pos="2" frame="1--1/12*3.5" text="خروجی" />
+
+    <lField pos="3" frame="1--1/12*4.5" text="خروجی"/>
+    <lField pos="4" frame="1--1/12*5.5" text="خروجی"/>
+    <lField pos="5" frame="1--1/12*6.5" text="خروجی"/>
+    
+    <button frame="2/5*3.5--1/12*8" id="saveB" text="ذخیره" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv" font="IRANSans" />
+    <button frame="2/5*1.5--1/12*8" id="saveSendB" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="svSend" font="IRANSans"/>
+</views>

@@ -1,0 +1,14 @@
+{
+  "name": "AmytisWatcher",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "bonjour": "^3.5.0",
+    "filehound": "*",
+    "optimist": "^0.6.1",
+    "socket.io": "^2.0.3"
+  }
+}

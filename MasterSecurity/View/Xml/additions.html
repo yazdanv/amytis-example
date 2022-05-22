@@ -1,0 +1,351 @@
+<label name="pLabel" ts="f6" font="IRANSans"/>
+<button name="pBtn" font="IRANSans" ts="f8"/>
+<pBtn name="bButton" round="5" bgc="bbtn" tc="white" padding="2"/>
+<view width="200" height="40" x="p.w/2-100" round="5" bgc="black" padding="3" name="topView">
+    <view frame="full" padding="1" bgc="yellow" round="5"/>
+    <pLabel id="tt" frame="full" text="انتخاب محل ?? @/title" />
+    <button frame="full">
+        var _db = Dyko.open("db");
+        var _zones = _db.collection("zones");
+        _zones.all(function (res) {
+            var arr = [];
+            var r; 
+            for (r in res) { arr.push(res[r].name);}
+            self.jsChoices({message: "لطفا یک محل را انتخاب کنید", buttons: arr, completion: function (index) {
+                let ind = index - 1;
+                log(index);
+                for (r in res) {
+                    if (r != ind) {
+                        _zones.modifyQuery({_id: res[r]._id}, {selected: false}, function (done) {_zones.commit();});
+                    }
+                }
+                _zones.modifyQuery({_id: res[ind]._id}, {selected: true}, function (done) {_zones.commit();});
+                 tt.text = res[ind].name;
+                setTimeout(function() {
+                    db = Dyko.open("db");
+                    zones = db.collection("zones");
+                    viewAppeared();
+                }, 100);
+            }});
+        });
+    </button>
+</view>
+<view name="zoneLine" frame="4/5*1.5--1/8*@/pos" id="zoneView@/pos">
+    <script>
+        function setZoneName@/pos(txt) {
+            self.label("nameZoneLabel@/pos").text = txt;
+        }
+    </script>
+    <pLabel id="nameZoneLabel@/pos" frame="7/8*1--1" padding="0,12,0,0" alignment="rtl" text="زون @/pos"/>
+    <button id="btn@/pos" frame="1/8*8--1" padding="4" source="check" font="IRANSans" clicked="if (check@/pos == 1) {check@/pos = 0;btn@/pos.reRender({source: 'uncheck'});} else {check@/pos = 1;btn@/pos.reRender({source: 'check'});}"/>
+</view>
+<view name="outSaveView" id="outSaveView@/pos">
+    <script>
+        actionType@/pos = 1; 
+        function setType@/pos(type) {
+            if (type == 1) {
+                fc@/pos()
+            } else if (type == 2) {
+                sc@/pos()
+            }  else if (type == 3) {
+                tc@/pos()
+            } 
+        }
+        function fc@/pos() {
+            actionType@/pos = 1; 
+            fCheck@/pos.reRender({hidden: 'false'}); 
+            sCheck@/pos.reRender({hidden: 'true'});
+            tCheck@/pos.reRender({hidden: 'true'});
+        }
+        function sc@/pos() {
+            actionType@/pos = 2; 
+            fCheck@/pos.reRender({hidden: 'true'}); 
+            sCheck@/pos.reRender({hidden: 'false'});
+            tCheck@/pos.reRender({hidden: 'true'});
+        }
+        function tc@/pos() {
+            actionType@/pos = 3; 
+            fCheck@/pos.reRender({hidden: 'true'}); 
+            sCheck@/pos.reRender({hidden: 'true'});
+            tCheck@/pos.reRender({hidden: 'false'});
+        }
+    </script>
+    <pLabel frame="1/5*4--1" text="خروجی @/pos" alignment="rtl"/>
+    <switch id="sw@/pos" frame="1/5*5.2--9/10*3" status="yes"/>
+    <button frame="0.8/5*3.2--1" text="" font="IRANSans" ts="f5.5" lines="3">fc@/pos()</button>
+    <image id="fCheck@/pos" frame="0.5/5*3.2--1" source="check" padding="20"/>
+    <button frame="0.8/5*2.35--1" text=" " font="IRANSans" ts="f4.5" lines="3">sc@/pos()</button>
+    <image id="sCheck@/pos" frame="0.5/5*2.2--1" source="check"  padding="20" hidden="yes"/>
+    <button frame="0.8/5*1.35--1" text="" font="IRANSans" ts="f4.5" lines="3">tc@/pos()</button>
+    <image id="tCheck@/pos" frame="0.5/5*1.2--1" source="check" padding="20" hidden="yes"/>
+</view>
+<view name="outLine" frame="1--1/6*@/pos" id="outView@/pos">
+    <script>
+        function setType@/pos(outType) {
+            if (outType == 1) {
+                btn1@/pos.reRender({hidden: "no"});
+                btn2@/pos.reRender({hidden: "no"});
+                btn3@/pos.reRender({hidden: "yes"});
+            } else if (outType == 2) {
+                btn1@/pos.reRender({hidden: "yes"});
+                btn2@/pos.reRender({hidden: "yes"});
+                btn3@/pos.reRender({hidden: "no"});
+            } else if (outType == 3) {
+                btn1@/pos.reRender({hidden: "no"});
+                btn2@/pos.reRender({hidden: "no"});
+                btn3@/pos.reRender({hidden: "no"});
+            }
+        }
+        function snd@/pos(msg) {
+            if (outAcc@/pos) { 
+                self.sendSMS("{0}1".format(msg), [num]);
+            } else { 
+                self.sendSMS("{0}0".format(msg), [num]);
+            }
+        }
+
+        function acb1@/pos() {
+            snd@/pos("*{0}**#@/pos1".format(pass));
+        }
+        function acb2@/pos() {
+            snd@/pos("*{0}**#@/pos0".format(pass));
+        }
+        function acb3@/pos() {
+            snd@/pos("*{0}**#@/pos2".format(pass));
+        }
+        function setOutName@/pos(txt) {
+            self.label("OutName@/pos").text = txt;
+        }
+    </script>
+    <pLabel frame="2/8*7--1" padding="0,12,0,0" alignment="rtl" text="خروجی @/pos" id="OutName@/pos" ts="f6"/>
+    <button id="btn1@/pos" font="IRANSans" frame="2/8*5--1" padding="4" clicked="acb1@/pos" text="روشن" round="5" bgc="bbtn" tc="white"/>
+    <button id="btn2@/pos" font="IRANSans" frame="2/8*3--1" padding="4" clicked="acb2@/pos" text="خاموش" round="5" bgc="bbtn" tc="white"/>
+    <button id="btn3@/pos" font="IRANSans" frame="2/8*1--1" padding="4" clicked="acb3@/pos" text="لحظه ای" round="5" bgc="bbtn" tc="white"/>
+</view>
+<view name="zonesScreen" frame="4/5*1.5--3/5*2" id="zonesScreen" bgc="white" elevation="5">
+    <script>
+        var check1 = 1;
+        var check2 = 1;
+        var check3 = 1;
+        var check4 = 1;
+        var check5 = 1;
+        var check6 = 1;
+        var check7 = 1;
+        var check8 = 1;
+        function zonesCheck() {
+            if (zoneCount == 5) {
+                zoneView6.reRender({hidden: 'yes'});
+                zoneView7.reRender({ hidden: 'yes' });
+                zoneView8.reRender({ hidden: 'yes' });
+            } else {
+                zoneView6.reRender({ hidden: 'no' });
+                zoneView7.reRender({ hidden: 'no' });
+                zoneView8.reRender({ hidden: 'no' });
+            }
+        }
+
+        function send() {
+            var zonesStr = "";
+            if (check1 == 1) {zonesStr += "1"} else {zonesStr += "0"}
+            if (check2 == 1) { zonesStr += "2" } else { zonesStr += "0" }
+            if (check3 == 1) { zonesStr += "3" } else { zonesStr += "0" }
+            if (check4 == 1) { zonesStr += "4" } else { zonesStr += "0" }
+            if (check5 == 1) { zonesStr += "5" } else { zonesStr += "0" }
+            if (zoneCount == 8) {
+                if (check6 == 1) { zonesStr += "6" } else { zonesStr += "0" }
+                if (check7 == 1) { zonesStr += "7" } else { zonesStr += "0" }
+                if (check8 == 1) { zonesStr += "8" } else { zonesStr += "0" }
+            }
+            self.sendSMS("*{0}**04{1}*{2}".format(pass, mStr(), zonesStr), [num]);
+            view.switchViews("", "zonesScreen");
+        }
+
+        function cancel() { view.switchViews("", "zonesScreen");}
+    </script>
+    <pLabel frame="1--1.2/10*1" text="انتخاب زون ها" alignment="rtl" ts="f10" padding="0,12,0,0"/>
+    <pLabel frame="1--1/10*2.2" text="زون های انتخاب شده فعال میباشند" alignment="rtl" padding="0,12,0,0"/>
+    <view frame="1--2/3*1.7">
+        <zoneLine pos="1" />
+        <zoneLine pos="2" />
+        <zoneLine pos="3" />
+        <zoneLine pos="4" />
+        <zoneLine pos="5" />
+        <zoneLine pos="6" />
+        <zoneLine pos="7" />
+        <zoneLine pos="8" />
+    </view>
+    <button frame="1/4*1--1/10*10" font="IRANSans" text="لغو" padding="0,0,8,8" clicked="cancel"/>
+    <button frame="1/4*2--1/10*10" font="IRANSans" text="ارسال" padding="0,0,8,4" clicked="send"/>
+</view>
+
+<view name="mem" id="memory@/pos">
+    <image frame="0.6/5*5.3--1" source="img_call ?? @/img"/>
+    <pLabel frame="1/5*3.9--1" alignment="rtl" text="حافظه @/pos ?? حافظه @/ps" ts="f6" />
+    <textfield id="mem@/pos" frame="2.9/5*1.1--1" padding="8" bgc="white" placeholder="شماره" maxCharacters="11" keyboardType="num" bs="line"/>
+</view>
+
+<view name="lField" id="lField@/pos">
+    <pLabel frame="2/5*3.9--1" alignment="center" text="@/text @/pos :" ts="f8 ?? @/ts" />
+    <textfield id="field@/pos" frame="2.9/5*1.1--1" padding="8" bgc="white" maxCharacters="10 ?? @/mc" text="@/text @/pos ?? @/ctxt" font="IRANSans" bs="line"/>
+</view>
+
+<view name="lField2" id="lField2@/pos">
+    <pLabel frame="2/5*3.9--1/4*1" alignment="center" text="@/text @/pos :" ts="f8 ?? @/ts" />
+    <textfield id="field@/pos" frame="9/10*1.5--3/4*2" padding="8" bgc="white" maxCharacters="10 ?? @/mc" text="@/text @/pos ?? @/ctxt" font="IRANSans" bs="line"/>
+</view>
+
+<view name="accView" id="accV@/pos">
+    <image frame="0.6/5*5.3--1" source="img_access" />
+    <pLabel frame="2/5*3--1" alignment="rtl" text="حافظه شماره @/pos" ts="f7" />
+    <switch id="swc@/pos" frame="1/5*1.4--2/4*2" status="no" />
+    <switch id="swr@/pos" frame="1/5*2.4--2/4*2" status="no" />
+</view>
+
+<view name="timeView" id="tm@/pos">
+    <script>
+        var hour@/pos = 0
+        var min@/pos = 0
+        self.picker("hourPicker@/pos")._onSelect = function (row, cmp) {hour@/pos=row}
+        self.picker("minPicker@/pos")._onSelect = function (row, cmp) {min@/pos=row}
+    </script>
+    <pLabel frame="3/5*3--1" alignment="center" text="زمان بندی شماره @/pos :" ts="f7 ?? @/ts" />
+    <picker id="hourPicker@/pos" frame="0.5/5*1.5--1">
+        <title>00</title>
+        <title>01</title>
+        <title>02</title>
+        <title>03</title>
+        <title>04</title>
+        <title>05</title>
+        <title>06</title>
+        <title>07</title>
+        <title>08</title>
+        <title>09</title>
+        <title>10</title>
+        <title>11</title>
+        <title>12</title>
+        <title>13</title>
+        <title>14</title>
+        <title>15</title>
+        <title>16</title>
+        <title>17</title>
+        <title>18</title>
+        <title>19</title>
+        <title>20</title>
+        <title>21</title>
+        <title>22</title>
+        <title>23</title>
+    </picker>
+    <label frame="0.2/5*2--1" text=":" ts="f9"/>
+    <picker id="minPicker@/pos" frame="0.5/5*2.2--1">
+        <title>00</title>
+        <title>01</title>
+        <title>02</title>
+        <title>03</title>
+        <title>04</title>
+        <title>05</title>
+        <title>06</title>
+        <title>07</title>
+        <title>08</title>
+        <title>09</title>
+        <title>10</title>
+        <title>11</title>
+        <title>12</title>
+        <title>13</title>
+        <title>14</title>
+        <title>15</title>
+        <title>16</title>
+        <title>17</title>
+        <title>18</title>
+        <title>19</title>
+        <title>20</title>
+        <title>21</title>
+        <title>22</title>
+        <title>23</title>
+        <title>24</title>
+        <title>25</title>
+        <title>26</title>
+        <title>27</title>
+        <title>28</title>
+        <title>29</title>
+        <title>30</title>
+        <title>31</title>
+        <title>32</title>
+        <title>33</title>
+        <title>34</title>
+        <title>35</title>
+        <title>36</title>
+        <title>37</title>
+        <title>38</title>
+        <title>39</title>
+        <title>40</title>
+        <title>41</title>
+        <title>42</title>
+        <title>43</title>
+        <title>44</title>
+        <title>45</title>
+        <title>46</title>
+        <title>47</title>
+        <title>48</title>
+        <title>49</title>
+        <title>50</title>
+        <title>51</title>
+        <title>52</title>
+        <title>53</title>
+        <title>54</title>
+        <title>55</title>
+        <title>56</title>
+        <title>57</title>
+        <title>58</title>
+        <title>59</title>
+    </picker>
+</view>
+
+<view name="actionTypeView" id="actionTp@/pos">
+    <script>
+        function setsw@/pos(num) {
+            self.getSwitch("sw@/pos1").off()
+            self.getSwitch("sw@/pos2").off()
+            self.getSwitch("sw@/pos3").off()
+            self.getSwitch("sw@/pos4").off()
+            if (num == 1) {
+                self.getSwitch("sw@/pos1").on()
+            } else if (num == 2) {
+                self.getSwitch("sw@/pos2").on()
+            } else if (num == 3) {
+                self.getSwitch("sw@/pos3").on()
+            } else if (num == 4) {
+                self.getSwitch("sw@/pos4").on()
+            }
+        }
+        self.getSwitch("sw@/pos1").isOn(function () {
+                setsw@/pos(1)
+            })
+
+        self.getSwitch("sw@/pos2").isOn(function () {
+                setsw@/pos(2)
+            })
+
+        self.getSwitch("sw@/pos3").isOn(function () {
+                setsw@/pos(3)
+            })
+
+        self.getSwitch("sw@/pos4").isOn(function () {
+                setsw@/pos(4)
+            })      
+    </script>
+
+    <pLabel frame="0.8/2*2.2--1/5*1" text="نوع عملکرد" ts="f8" />
+    <pLabel frame="1.5/2*1.4--1/5*2" text="فعال کردن سیستم" ts="f7" alignment="rtl"/>
+    <switch id="sw@/pos1" frame="1/5*1.5--1/5*2.2" status="yes" />
+    <pLabel frame="1.5/2*1.4--1/5*3" text="غیر فعال کردن سیستم" ts="f7" alignment="rtl" />
+    <switch id="sw@/pos2" frame="1/5*1.5--1/5*3.2" status="no" />
+    <pLabel frame="1.5/2*1.4--1/5*4" text="روشن کردن خروجی رله" ts="f7" alignment="rtl" />
+    <switch id="sw@/pos3" frame="1/5*1.5--1/5*4.2" status="no" />
+    <pLabel frame="1.5/2*1.4--1/5*5" text="خاموش کردن خروجی رله" ts="f7" alignment="rtl" />
+    <switch id="sw@/pos4" frame="1/5*1.5--1/5*5.2" status="no" />
+</view>
+
+<view name="userControll" id="@/pos">
+    <pLabel id="uLabel@/pos" frame="2/3*1--1" text="کاربر @/pos" ts="f7" alignment="rtl" padding="0,8,0,0"/>
+    <switch id="user@/pos" frame="1/3*3--1" status="yes ?? @/st"/>
+</view>

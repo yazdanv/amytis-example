@@ -1,0 +1,131 @@
+<views class="local" bgc="bl">
+    <script>
+        var db;
+        var zones;
+        var _id = 0;
+        var num = "";
+        var pass = "";
+
+        var once1 = 1;
+        var once2 = 1;
+
+        function viewLoaded() {viewAppeared()}
+
+        function viewAppeared() {
+            db = Dyko.open("db");
+            zones = db.collection("zones");
+            clear();
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    num = res[0].number;
+                    pass = res[0].pass;
+                    log(res[0]);
+                    if (res[0].hour1) {
+                        hour1 = res[0].hour1;
+                        hourPicker1.select(0, res[0].hour1);
+                    }
+                    if (res[0].hour2) {
+                        hour2 = res[0].hour2;
+                        hourPicker2.select(0, res[0].hour2);
+                    }
+                    if (res[0].min1) {
+                        min1 = res[0].min1;
+                        minPicker1.select(0, res[0].min1);
+                    }
+                    if (res[0].min2) {
+                        min2 = res[0].min2;
+                        minPicker2.select(0, res[0].min2);
+                    }
+                    if (res[0].timerSt1) {
+                        setsw1(res[0].timerType1);
+                        if (res[0].timerSt1 == 2) {
+                            once1 = 2;
+                            aCheck1.reRender({hidden: "no"});oCheck1.reRender({hidden: "yes"});
+                        } 
+                    }
+                    if (res[0].timerSt2) {
+                        setsw2(res[0].timerType2);
+                        if (res[0].timerSt2 == 2) {
+                            once2 = 2;
+                            aCheck2.reRender({hidden: "no"});oCheck2.reRender({hidden: "yes"});
+                        }
+                    }
+                }
+            });
+        }
+    
+        function clear() {
+            hourPicker1.select(0, 0);
+            minPicker1.select(0, 0);
+            hourPicker2.select(0, 0);
+            minPicker2.select(0, 0);
+            setsw1(1);
+            setsw2(1);
+            once1=1;oCheck1.reRender({hidden: "no"});aCheck1.reRender({hidden: "yes"});
+            once2=1;oCheck2.reRender({hidden: "no"});aCheck2.reRender({hidden: "yes"});
+        }
+
+        function sv1() {
+            var st = once1;
+            var st2 = 1
+            if (sw11.status) {st2 = 1} else if (sw12.status) {st2 = 2} else if (sw13.status) { st2 = 3 } else if (sw14.status) { st2 = 4 }
+            var hL = "{0}".format(hour1);
+            var mL = "{0}".format(min1);
+            if (hL.length == 1) {hL = "0{0}".format(hour1);}
+            if (mL.length == 1) {mL = "0{0}".format(min1);}
+            zones.modifyQuery({selected: true}, {hour1: hour1, min1: min1, timerSt1: st, timerType1: st2}, function (done) {
+                zones.commit();
+            });
+            self.sendSMS("*{0}**98*{1}{2}{3}{4}#".format(pass, hL, mL, st, st2), [num])
+        }
+        function del1() {
+            self.sendSMS("*{0}**98#".format(pass), [num]);
+        }
+
+
+        function sv2() {
+            var st = once2;
+            var st2 = 1
+            if (sw21.status) { st2 = 1 } else if (sw22.status) { st2 = 2 } else if (sw23.status) { st2 = 3 } else if (sw24.status) { st2 = 4 }
+            var hL = "{0}".format(hour2);
+            var mL = "{0}".format(min2);
+            if (hL.length == 1) {hL = "0{0}".format(hour2);}
+            if (mL.length == 1) {mL = "0{0}".format(min2);}
+            zones.modifyQuery({ selected: true }, { hour2: hour2, min2: min2, timerSt2: st, timerType2: st2 }, function (done) {
+                zones.commit();
+            });
+            self.sendSMS("*{0}**99*{1}{2}{3}{4}#".format(pass, hL, mL, st, st2), [num])
+        }
+        function del2() {
+            self.sendSMS("*{0}**99#".format(pass), [num]);
+        }
+
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help9"});</button>
+    </topBar>
+    <view frame="full" padding="64,0,0,0" demo="yes" scroll="1000">
+        <timeView pos="1" frame="1--1/20*1.2"/>
+        <pLabel frame="0.8/2*2.2--1/20*2.5" text="مدت اعتبار : " ts="f7"/>
+        <button frame="1/5*1.6--1/20*2.5" text="فقط یکبار">once1=1;oCheck1.reRender({hidden: "no"});aCheck1.reRender({hidden: "yes"});</button>
+        <image id="oCheck1" frame="0.5/5*1.1--1/20*2.5" source="check" padding="16"/>
+        <button frame="1/5*3.1--1/20*2.5" text="همیشه" >once1=2;aCheck1.reRender({hidden: "no"});oCheck1.reRender({hidden: "yes"});</button>
+        <image id="aCheck1" frame="0.5/5*2.8--1/20*2.5" source="check" padding="16"  hidden="yes"/>
+        <actionTypeView pos="1" frame="1--5/20*3.7"/>
+        <button frame="2/5*3.5--1/20*9" id="save" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv1" font="IRANSans" />
+        <button frame="2/5*1.5--1/20*9" id="newItem" text="حذف" round="5" bgc="bbtn" tc="white" padding="2" clicked="del1" font="IRANSans"/>
+
+        <timeView pos="2" frame="1--1/20*11.2" />
+        <pLabel frame="0.8/2*2.2--1/20*12.5" text="مدت اعتبار : "  ts="f7"/>
+        <button frame="1/5*1.6--1/20*12.5" text="فقط یکبار">once2=1;oCheck2.reRender({hidden: "no"});aCheck2.reRender({hidden: "yes"});</button>
+        <image id="oCheck2" frame="0.5/5*1.1--1/20*12.5" source="check" padding="16"/>
+        <button frame="1/5*3.1--1/20*12.5" text="همیشه" >once2=2;aCheck2.reRender({hidden: "no"});oCheck2.reRender({hidden: "yes"});</button>
+        <image id="aCheck2" frame="0.5/5*2.8--1/20*12.5" source="check" padding="16" hidden="yes"/>
+        <actionTypeView pos="2" frame="1--5/20*13.7" />
+        <button frame="2/5*3.5--1/20*19" id="save" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv2" font="IRANSans"/>
+        <button frame="2/5*1.5--1/20*19" id="newItem" text="حذف" round="5" bgc="bbtn" tc="white" padding="2" clicked="del2" font="IRANSans" />
+    </view>
+</views>

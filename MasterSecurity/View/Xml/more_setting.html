@@ -1,0 +1,81 @@
+<views class="local" bgc="bl">
+    <script>
+        var zones = Dyko.open("db").collection("zones");
+        var _id = 0;
+        var simType = 1;
+        var reportType = 0;
+        var pPass = "";
+        var num = "";
+
+        function viewLoaded() { viewAppeared() }
+
+        function viewAppeared() {
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    pPass = res[0].pass;
+                    passField.text = res[0].pass;
+                    num = res[0].number;
+                    if (res[0].simType == 1) {
+                        iCheck.reRender({ hidden: 'false' });
+                        mCheck.reRender({ hidden: 'true' });
+                    } else {
+                        mCheck.reRender({ hidden: 'false' });
+                        iCheck.reRender({ hidden: 'true' });
+                    }
+                    if (res[0].reportType == 0) {
+                        jCheck.reRender({ hidden: 'false' });
+                        aCheck.reRender({ hidden: 'true' });
+                    } else {
+                        aCheck.reRender({ hidden: 'false' });
+                        jCheck.reRender({ hidden: 'true' });
+                    }
+                }
+            });
+        }
+
+        function savePartOne() {
+            zones.modifyQuery({ selected: true }, { simType: simType, reportType: reportType}, function (done) {
+                if (simType == 2) {
+                    self.sendSMS("*{0}**20*{1}!*140*#!*140*11#!".format(pPass, reportType, ), [num]);
+                } else {
+                    self.sendSMS("*{0}**20*{1}!*141*!*141*1#!".format(pPass, reportType, ), [num]);
+                }
+                zones.commit();
+            });
+        }
+
+        function savePartTwo() {
+            zones.modifyQuery({ selected: true }, {pass: passField.txt}, function (done) {
+                self.sendSMS("*{0}**25*{1}#".format(pPass, passField.txt), [num]);
+                zones.commit();
+            });
+        }
+
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+    </topBar>
+
+    <pLabel frame="4/5*1.5--1/12*2.2" alignment="rtl" text="نوع سیمکارت" ts="f9" />
+    <button id="mtn" frame="1.5/5*4.5--1/12*3.2" text="ایرانسل" font="IRANSans">simType = 1; iCheck.reRender({hidden: 'false'}); mCheck.reRender({hidden: 'true'});</button>
+    <image id="iCheck" frame="0.5/5*4--1/12*3.2" source="check" padding="16" />
+    <button id="mci" frame="1.5/5*2.5--1/12*3.2" text="همراه اول" font="IRANSans">simType = 2; mCheck.reRender({hidden: 'false'}); iCheck.reRender({hidden: 'true'});</button>
+    <image id="mCheck" frame="0.5/5*2--1/12*3.2" source="check" padding="16" hidden="yes" />
+
+    <pLabel frame="4/5*1.5--1/12*4.2" alignment="rtl" text="انتخاب حالت ارسال گزارش" ts="f9" />
+    <button id="justAlarm" frame="3.5/5*2.5--1/12*5.2" text="فقط ارسال پیام های هشدار" font="IRANSans" alignment="rtl">reportType = 0; jCheck.reRender({hidden: 'false'}); aCheck.reRender({hidden: 'true'});</button>
+    <image id="jCheck" frame="0.5/5*2--1/12*5.2" source="check" padding="16" />
+    <button id="allReports" frame="3.5/5*2.5--1/12*6.2" text="ارسال همه ی گزارش ها" font="IRANSans" alignment="rtl">reportType = 1; aCheck.reRender({hidden: 'false'}); jCheck.reRender({hidden: 'true'});</button>
+    <image id="aCheck" frame="0.5/5*2--1/12*6.2" source="check" padding="16" hidden="yes" />
+
+    <button frame="2/5*3.5--0.8/12*7.6" text="ذخیره و ارسال" clicked="savePartOne" font="IRANSans" round="5" bgc="bbtn" tc="white" padding="2" />
+    <view frame="4/5*1.5--1/50*34" height="1" bgc="white" />
+
+    <pLabel frame="2.5/5*3.3--1/12*9.2" alignment="rtl" text="تغییر رمز عبور دستگاه :" ts="f6.5" lines="3"/>
+    <textfield id="passField" frame="2.4/5*1.1--1/12*9.2" padding="8" bgc="white" />
+
+    <button frame="2/5*3.5--0.8/12*10.6" text="ذخیره و ارسال" clicked="savePartTwo" font="IRANSans" round="5" bgc="bbtn" tc="white" padding="2"/>
+    <view frame="4/5*1.5--1/50*47" height="1" bgc="white" />
+</views>

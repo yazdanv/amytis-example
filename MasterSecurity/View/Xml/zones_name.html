@@ -1,0 +1,80 @@
+<views class="local" bgc="bl">
+    <script>
+        var zones = Dyko.open("db").collection("zones");
+        var _id = 0;
+        var num = "";
+        var pass = "";
+
+        function viewLoaded() {
+            viewAppeared()
+        }
+    
+        function viewAppeared() {
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    num = res[0].number;
+                    pass = res[0].pass;
+                    if (res[0].zones == 8) {
+                        secondView.reRender({hidden: "yes"});
+                    }
+                    var i = 0;
+                    var cnt = [1, 2, 3, 4, 5, 6, 7, 8];
+                    for (i in cnt) {
+                        log("start");
+                        var vl = "nameZone{0}".format(cnt[i]);
+                        log(vl);
+                       if (vl in res[0]) {log(res[0][vl]);self.textfield("field{0}".format(cnt[i])).reRender({text: res[0][vl]});} else {self.textfield("field{0}".format(cnt[i])).reRender({text: "زون {0}".format(cnt[i])});}
+                        log("done");
+                    }
+                }
+            });
+        }
+
+        function sv() {
+            zones.modifyQuery({ selected: true }, { nameZone1: field1.txt, nameZone2: field2.txt, nameZone3: field3.txt, nameZone4: field4.txt, nameZone5: field5.txt }, function (done) {
+                zones.commit();
+            });
+            toast("ذخیره شد");
+        }
+
+        function svSend() {
+            zones.modifyQuery({ selected: true }, { nameZone1: field1.txt, nameZone2: field2.txt, nameZone3: field3.txt, nameZone4: field4.txt, nameZone5: field5.txt }, function (done) {
+                zones.commit();
+            });
+            self.sendSMS("*{0}**31#{1}!{2}!{3}!{4}!{5}!".format(pass, field1.txt, field2.txt, field3.txt, field4.txt, field5.txt), [num]);
+        }
+
+        function sv2() {
+
+        }
+
+        function svSend2() {
+
+        }
+
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help4"});</button>
+    </topBar>
+    <lField pos="1" frame="1--0.9/12*2.2" text="زون"/>
+    <lField pos="2" frame="1--0.9/12*3.1" text="زون" />
+    <lField pos="3" frame="1--0.9/12*4" text="زون" />
+    <lField pos="4" frame="1--0.9/12*4.9" text="زون" />
+    <lField pos="5" frame="1--0.9/12*5.8" text="زون" />
+
+    <button frame="2/5*3.5--1/12*7" id="saveB" text="ذخیره" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv" font="IRANSans"/>
+    <button frame="2/5*1.5--1/12*7" id="saveSendB" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="svSend" font="IRANSans"/>
+
+    <view id="secondView" frame="1--4.5/12*8.3" hidden="yes">
+            <lField pos="6" frame="1--0.9/4.5*1" text="زون" />
+            <lField pos="7" frame="1--0.9/4.5*1.9" text="زون" />
+            <lField pos="8" frame="1--0.9/4.5*2.8" text="زون" />
+            
+            <button frame="2/5*3.5--1/4.5*4.2" id="saveB" text="ذخیره" round="5" bgc="bbtn" tc="white" padding="2" clicked="sv" />
+            <button frame="2/5*1.5--1/4.5*4.2" id="saveSendB" text="ذخیره و ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="svSend"
+            />
+    </view>
+</views>

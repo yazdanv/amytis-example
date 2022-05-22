@@ -1,0 +1,172 @@
+<views class="local" bgc="bl">
+    <script>
+        var db;
+        var zones;
+        var _id = 0;
+        var num = "";
+        var pass = "";
+        var enable1 = 0;
+        var enable2 = 0;
+
+        function viewLoaded() {viewAppeared()}
+
+        function viewAppeared() {
+            db = Dyko.open("db");
+            zones = db.collection("zones");
+            zones.find({ selected: true }, function (res) {
+                if (res.length != 0) {
+                    tt.reRender({ text: res[0].name });
+                    _id = res[0]._id;
+                    num = res[0].number;
+                    pass = res[0].pass;
+                   if ("nameUser1" in res[0]) {uLabel1.text = res[0].nameUser1;} else {uLabel1.text = "کاربر 1";}
+                   if ("nameUser2" in res[0]) {uLabel2.text = res[0].nameUser2;} else {uLabel2.text = "کاربر 2";}
+                   if ("nameUser3" in res[0]) {uLabel3.text = res[0].nameUser3;} else {uLabel3.text = "کاربر 3";}
+                   if ("nameUser4" in res[0]) {uLabel4.text = res[0].nameUser4;} else {uLabel4.text = "کاربر 4";}
+                   if ("nameUser5" in res[0]) {uLabel5.text = res[0].nameUser5;} else {uLabel5.text = "کاربر 5";}
+                   if ("nameUser6" in res[0]) {uLabel6.text = res[0].nameUser6;} else {uLabel6.text = "کاربر 6";}
+                   if ("nameUser7" in res[0]) {uLabel7.text = res[0].nameUser7;} else {uLabel7.text = "کاربر 7";}
+                   if ("nameUser8" in res[0]) {uLabel8.text = res[0].nameUser8;} else {uLabel8.text = "کاربر 8";}
+                   if ("userStatusEnable1" in res[0]) {user1.status = res[0]["userStatusEnable1"]} else {user1.status = true;}
+                   if ("userStatusEnable2" in res[0]) {user2.status = res[0]["userStatusEnable2"]} else {user2.status = true;}
+                   if ("userStatusEnable3" in res[0]) {user3.status = res[0]["userStatusEnable3"]} else {user3.status = true;}
+                   if ("userStatusEnable4" in res[0]) {user4.status = res[0]["userStatusEnable4"]} else {user4.status = true;}
+                   if ("userStatusEnable5" in res[0]) {user5.status = res[0]["userStatusEnable5"]} else {user5.status = true;}
+                   if ("userStatusEnable6" in res[0]) {user6.status = res[0]["userStatusEnable6"]} else {user6.status = true;}
+                   if ("userStatusEnable7" in res[0]) {user7.status = res[0]["userStatusEnable7"]} else {user7.status = true;}
+                   if ("userStatusEnable8" in res[0]) {user8.status = res[0]["userStatusEnable8"]} else {user8.status = true;}
+                   if ("stEnable1" in res[0]) {
+                       if (res[0]["stEnable1"] == 0) {
+                           enable1=0;
+                           oCheck1.reRender({hidden: "no"});
+                           aCheck1.reRender({hidden: "yes"});
+                       } else {
+                           enable1=1;
+                           oCheck1.reRender({hidden: "yes"});
+                           aCheck1.reRender({hidden: "no"});
+                       }
+                   } else {
+                       enable1=0;
+                       oCheck1.reRender({hidden: "no"});
+                       aCheck1.reRender({hidden: "yes"});
+                   }
+                   if ("stEnable2" in res[0]) {
+                       if (res[0]["stEnable2"] == 2) {
+                           enable2=2;
+                           cCheck2.reRender({hidden: "no"});
+                           oCheck2.reRender({hidden: "yes"});
+                           aCheck2.reRender({hidden: "yes"});
+                       } else if (res[0]["stEnable2"] == 0) {
+                           enable2=0;
+                           oCheck2.reRender({hidden: "no"});
+                           aCheck2.reRender({hidden: "yes"});
+                           cCheck2.reRender({hidden: "yes"});
+                       } else {
+                           enable2=1;
+                           aCheck2.reRender({hidden: "no"});
+                           oCheck2.reRender({hidden: "yes"});
+                           cCheck2.reRender({hidden: "yes"});
+                       }
+                   } else {
+                       enable2=0;
+                       oCheck2.reRender({hidden: "no"});
+                       aCheck2.reRender({hidden: "yes"});
+                       cCheck2.reRender({hidden: "yes"});
+                   }
+                   if ("alTime" in res[0]) {
+                       alarmTime.reRender({text: res[0]["alTime"]});
+                   } else {
+                       alarmTime.reRender({text: ''});
+                   }
+                }
+            });
+        }
+
+        function send1() {
+            var st = enable1;
+            zones.modifyQuery({ selected: true }, { stEnable1: st}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**91*{1}#".format(pass, st), [num]);
+        }
+        function send2() {
+            var st = enable2;
+            zones.modifyQuery({ selected: true }, { stEnable2: st}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**92*{1}#".format(pass, st), [num]);
+        }
+        function send3() {
+            zones.modifyQuery({ selected: true }, { alTime: alarmTime.txt}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**93*{1}#".format(pass, alarmTime.txt), [num]);
+        }
+        function send4() {
+            var arr = [];
+            if (user1.status) {arr.push(1);} else {arr.push(0);}
+            if (user2.status) { arr.push(1); } else { arr.push(0); }
+            if (user3.status) { arr.push(1); } else { arr.push(0); }
+            if (user4.status) { arr.push(1); } else { arr.push(0); }
+            if (user5.status) { arr.push(1); } else { arr.push(0); }
+            if (user6.status) { arr.push(1); } else { arr.push(0); }
+            if (user7.status) { arr.push(1); } else { arr.push(0); }
+            if (user8.status) { arr.push(1); } else { arr.push(0); }
+            zones.modifyQuery({ selected: true }, { userStatusEnable1: arr[0], userStatusEnable2: arr[1], userStatusEnable3: arr[2], userStatusEnable4: arr[3], userStatusEnable5: arr[4], userStatusEnable6: arr[5], userStatusEnable7: arr[6], userStatusEnable8: arr[7]}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**94*{1}{2}{3}{4}{5}{6}{7}{8}#".format(pass, arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7]), [num]);
+        }
+        function sendall() {
+            var st1 = enable1;
+            var st2 = enable2;
+            zones.modifyQuery({ selected: true }, { stEnable1: st1, stEnable2: st2, alTime: alarmTime.txt}, function (done) { zones.commit();});
+            var arr = [];
+            if (user1.status) {arr.push(1);} else {arr.push(0);}
+            if (user2.status) { arr.push(1); } else { arr.push(0); }
+            if (user3.status) { arr.push(1); } else { arr.push(0); }
+            if (user4.status) { arr.push(1); } else { arr.push(0); }
+            if (user5.status) { arr.push(1); } else { arr.push(0); }
+            if (user6.status) { arr.push(1); } else { arr.push(0); }
+            if (user7.status) { arr.push(1); } else { arr.push(0); }
+            if (user8.status) { arr.push(1); } else { arr.push(0); }
+            zones.modifyQuery({ selected: true }, { userStatusEnable1: arr[0], userStatusEnable2: arr[1], userStatusEnable3: arr[2], userStatusEnable4: arr[3], userStatusEnable5: arr[4], userStatusEnable6: arr[5], userStatusEnable7: arr[6], userStatusEnable8: arr[7]}, function (done) { zones.commit();});
+            self.sendSMS("*{0}**95*{1}{2}{3}{4}{5}{6}{7}{8}{9}{10}{11}#".format(pass, st1, st2, alarmTime.txt, arr[0], arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7]), [num]);
+        }
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="محل جدید" />
+        <button frame="1/8*7.8--1" padding="4" source="ic_help">open("user_manual", {"hname": "help10"});</button>
+    </topBar>
+    <view frame="full" padding="64,0,0,0" scroll="800">
+        <pLabel frame="0.8/2*2.2--1/18*1.2" text="دینگ دانگ" ts="f9"/>
+        <button frame="1/5*3.3--1/18*2.2" text="غیر فعال">enable1=0;oCheck1.reRender({hidden: "no"});aCheck1.reRender({hidden: "yes"});</button>
+        <image id="oCheck1" frame="0.5/5*2.8--1/18*2.2" source="check" padding="16"/>
+        <button frame="1/5*4.7--1/18*2.2" text="فعال" >enable1=1;aCheck1.reRender({hidden: "no"});oCheck1.reRender({hidden: "yes"});</button>
+        <image id="aCheck1" frame="0.5/5*4.4--1/18*2.2" source="check" padding="16"  hidden="yes"/>
+        <button frame="1/5*1.1--1/18*1.5" id="save1" text="ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="send1" font="IRANSans" />
+        <view frame="4/5*1.5--1/18*3.5" height="1" bgc="white" />
+
+        <pLabel frame="1--1/18*3.7" text="وضعیت تک آژیر" ts="f8" alignment="rtl" padding="0,8,0,0"/>
+        <button frame="3/5*2.7--1/18*5" text="بلندگوی داخلی"  alignment="rtl">enable2=0;oCheck2.reRender({hidden: "no"});aCheck2.reRender({hidden: "yes"});cCheck2.reRender({hidden: "yes"});</button>
+        <image id="oCheck2" frame="0.5/5*5.5--1/18*5" source="check" padding="16"/>
+        <button frame="3/5*2.7--1/18*6" text="بلندگوی داخلی + siren"  alignment="rtl">enable2=1;aCheck2.reRender({hidden: "no"});oCheck2.reRender({hidden: "yes"});cCheck2.reRender({hidden: "yes"});</button>
+        <image id="aCheck2" frame="0.5/5*5.5--1/18*6" source="check" padding="16"  hidden="yes"/>
+        <button frame="3/5*2.7--2/18*7" text="بلندگوی داخلی + siren + بلندگوی خارجی" alignment="rtl">enable2=2;cCheck2.reRender({hidden: "no"});oCheck2.reRender({hidden: "yes"});aCheck2.reRender({hidden: "yes"});</button>
+        <image id="cCheck2" frame="0.5/5*5.5--1/18*7.5" source="check" padding="16"  hidden="yes"/>
+        <button frame="1/5*1.1--1/18*4.5" id="save2" text="ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="send2" font="IRANSans" />
+        <view frame="4/5*1.5--1/18*9.5" height="1" bgc="white" />
+
+        <pLabel frame="1.2/3*2.8--1/18*10" text="مدت زمان آژیر" ts="f8" alignment="rtl" padding="0,8,0,0" />
+        <textfield id="alarmTime" frame="0.6/3*2.2--1/18*10" padding="8" bgc="white" keyboardType="num" maxCharacters="3" bs="line"/>
+        <pLabel frame="0.6/3*1.6--1/18*10" text="ثانیه" ts="f8" alignment="rtl" padding="0,8,0,0" />
+        <button frame="1/5*1.1--1/18*10" id="save3" text="ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="send3" font="IRANSans" />
+        <view frame="4/5*1.5--1/18*11.5" height="1" bgc="white" />
+
+        <pLabel frame="1--1/18*11.7" text="کنترل دسترسی کاربر ها" ts="f8" alignment="rtl" padding="0,8,0,0" />
+        <userControll pos="1" frame="1/2*2--0.6/18*12.8"/>
+        <userControll pos="2" frame="1/2*1--0.6/18*12.8" />
+        <userControll pos="3" frame="1/2*2--0.6/18*13.8" />
+        <userControll pos="4" frame="1/2*1--0.6/18*13.8" />
+        <userControll pos="5" frame="1/2*2--0.6/18*14.8" />
+        <userControll pos="6" frame="1/2*1--0.6/18*14.8" />
+        <userControll pos="7" frame="1/2*2--0.6/18*15.8" />
+        <userControll pos="8" frame="1/2*1--0.6/18*15.8" />
+        <button frame="1/5*1.1--1/18*16.5" id="save4" text="ارسال" round="5" bgc="bbtn" tc="white" padding="2" clicked="send4" font="IRANSans" />
+        <view frame="4/5*1.5--1/18*17.6" height="1" bgc="white" />
+
+        <button frame="4/5*1.5--1/18*17.8" id="save4" text="ارسال همه موارد" round="5" bgc="bbtn" tc="white" padding="2" clicked="sendall" font="IRANSans" />
+    </view>
+</views>

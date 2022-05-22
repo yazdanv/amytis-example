@@ -1,0 +1,44 @@
+<views class="local" bgc="white">
+    <script>
+        function viewAppeared() {
+            var u = Dyko.open("db").collection("user");
+            u.all(function (res) {
+                if (res[0].isAdmin == 0) {
+                    b3.reRender({hidden: "yes"});
+                    b7.reRender({hidden: "yes"});
+                    b8.reRender({hidden: "yes"});
+                    b9.reRender({hidden: "yes"});
+                    b10.reRender({hidden: "yes"});
+                    b4.reRender({frame: "1--1/13*4.5"}); b4.reCalculateFrame();
+                    b5.reRender({frame: "1--1/13*5.5"}); b5.reCalculateFrame();
+                    b6.reRender({frame: "1--1/13*6.5"}); b6.reCalculateFrame();
+                    b11.reRender({frame: "1--1/13*7.5"}); b11.reCalculateFrame();
+                } else {
+                    b3.reRender({hidden: "no"});
+                    b7.reRender({hidden: "no"});
+                    b8.reRender({hidden: "no"});
+                    b9.reRender({hidden: "no"});
+                    b10.reRender({hidden: "no"});
+                    b4.reRender({frame: "1--1/13*5.5"}); b4.reCalculateFrame();
+                    b5.reRender({frame: "1--1/13*6.5"}); b5.reCalculateFrame();
+                    b6.reRender({frame: "1--1/13*7.5"}); b6.reCalculateFrame();
+                    b11.reRender({frame: "1--1/13*12.5"}); b11.reCalculateFrame();
+                }
+            });
+        }
+    </script>
+    <topBar hidden="false" bgc="ymain" frame="p.w * 0.9">
+        <topView title="تنظیمات"/>
+    </topBar>
+    <button id="b1" frame="1--1/13*2.5" padding="1,12,1,12" source="btn_tanzimate_mahalnasb">open("zone_setting");</button>
+    <button id="b2" frame="1--1/13*3.5" padding="1,12,1,12" source="btn_tanzimat">open("software_setting");</button>
+    <button id="b3" frame="1--1/13*4.5" padding="1,12,1,12" source="btn_shomareha_dastresi">open("numbers_access");</button>
+    <button id="b4" frame="1--1/13*5.5" padding="1,12,1,12" source="btn_name_zoon">open("zones_name");</button>
+    <button id="b5" frame="1--1/13*6.5" padding="1,12,1,12" source="btn_name_rimot">open("users_name");</button>
+    <button id="b6" frame="1--1/13*7.5" padding="1,12,1,12" source="btn_name_khorojiha">open("outs_name");</button>
+    <button id="b7" frame="1--1/13*8.5" padding="1,12,1,12" source="btn_name_nasab">open("installer_name");</button>
+    <button id="b8" frame="1--1/13*9.5" padding="1,12,1,12" source="btn_matn_tahrik">open("trigger_text");</button>
+    <button id="b9" frame="1--1/13*10.5" padding="1,12,1,12" source="btn_tanzimat_zamansang">open("set_timer");</button>
+    <button id="b10" frame="1--1/13*11.5" padding="1,12,1,12" source="btn_tanzimatpanel">open("panel_setting");</button>
+    <button id="b11" frame="1--1/13*12.5" padding="1,12,1,12" source="btn_rahnama_estefade">open("user_manual");</button>
+</views>
